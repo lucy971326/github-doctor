@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.RepoInfo.Owner}}/{{.RepoInfo.Repo}} - GitHub Doctor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-tertiary: #18181b;
+            --bg-card: #1c1c1f;
+            --border: #27272a;
+            --border-hover: #3f3f46;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent: #22d3ee;
+            --accent-dim: rgba(34, 211, 238, 0.1);
+            --accent-glow: rgba(34, 211, 238, 0.15);
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 64px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #06b6d4);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .brand {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .repo-name {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .repo-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Score Section */
+        .score-section {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+            margin-bottom: 64px;
+            padding: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            animation: slideUp 0.6s ease 0.1s both;
+        }
+
+        .score-ring {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+        }
+
+        .score-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-ring-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 8;
+        }
+
+        .score-ring-fill {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 408;
+            transition: stroke-dashoffset 1.5s ease 0.5s;
+        }
+
+        .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .score-meta {
+            flex: 1;
+        }
+
+        .score-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .score-summary {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            animation: slideUp 0.6s ease 0.2s both;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            padding: 24px;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .stat-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Dimensions */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            animation: slideUp 0.6s ease 0.3s both;
+        }
+
+        .dimensions {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            animation: slideUp 0.6s ease 0.35s both;
+        }
+
+        .dimension {
+            background: var(--bg-card);
+            padding: 24px 28px;
+            display: grid;
+            grid-template-columns: 140px 60px 1fr;
+            align-items: center;
+            gap: 24px;
+            transition: background 0.2s;
+        }
+
+        .dimension:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .dimension-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .dimension-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent);
+            text-align: right;
+        }
+
+        .dimension-bar {
+            height: 4px;
+            background: var(--bg-primary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .dimension-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            width: 0;
+            animation: barFill 1s ease forwards;
+        }
+
+        .dimension-comment {
+            grid-column: 1 / -1;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 12px;
+        }
+
+        /* Languages */
+        .languages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 48px;
+            animation: slideUp 0.6s ease 0.4s both;
+        }
+
+        .lang-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .lang-tag:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-tertiary);
+        }
+
+        .lang-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Meta Info */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: slideUp 0.6s ease 0.45s both;
+        }
+
+        .meta-item {
+            background: var(--bg-card);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meta-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 64px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            animation: slideUp 0.6s ease 0.5s both;
+        }
+
+        /* No Score */
+        .no-score {
+            padding: 48px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 32px;
+            animation: slideUp 0.6s ease 0.1s both;
+        }
+
+        .no-score-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .no-score-text {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes barFill {
+            to {
+                width: var(--bar-width);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 16px;
+            }
+
+            .repo-name {
+                font-size: 28px;
+            }
+
+            .score-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 24px;
+                padding: 32px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dimension {
+                grid-template-columns: 1fr 60px;
+                gap: 12px;
+            }
+
+            .dimension-score {
+                text-align: left;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-top">
+                <div class="logo">⚡</div>
+                <span class="brand">GitHub Doctor</span>
+            </div>
+            <h1 class="repo-name">{{.RepoInfo.Repo}}</h1>
+            <p class="repo-url">{{.RepoInfo.Owner}}/{{.RepoInfo.Repo}}</p>
+        </header>
+
+        {{if .ScoreResult}}
+        <div class="score-section">
+            <div class="score-ring">
+                <svg width="140" height="140" viewBox="0 0 140 140">
+                    <circle class="score-ring-bg" cx="70" cy="70" r="65"/>
+                    <circle class="score-ring-fill" cx="70" cy="70" r="65"
+                            style="stroke-dashoffset: {{scoreOffset .ScoreResult.OverallScore}}"/>
+                </svg>
+                <div class="score-value">{{.ScoreResult.OverallScore}}</div>
+            </div>
+            <div class="score-meta">
+                <div class="score-title">综合评分</div>
+                <div class="score-summary">{{.ScoreResult.Summary}}</div>
+            </div>
+        </div>
+        {{else}}
+        <div class="no-score">
+            <div class="no-score-icon">📊</div>
+            <div class="no-score-text">未启用深度分析 · 仅显示基础数据</div>
+        </div>
+        {{end}}
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">{{.GitHubStats.Stars}}</div>
+                <div class="stat-label">Stars</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{.GitHubStats.Forks}}</div>
+                <div class="stat-label">Forks</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{.GitHubStats.OpenIssues}}</div>
+                <div class="stat-label">Issues</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{.GitHubStats.Watchers}}</div>
+                <div class="stat-label">Watchers</div>
+            </div>
+        </div>
+
+        {{if .ScoreResult}}
+        <div class="section-title">维度评分</div>
+        <div class="dimensions">
+            {{range .ScoreResult.Dimensions}}
+            <div class="dimension">
+                <div class="dimension-name">{{.Name}}</div>
+                <div class="dimension-score">{{.Score}}</div>
+                <div class="dimension-bar">
+                    <div class="dimension-bar-fill" style="--bar-width: {{.Score}}%"></div>
+                </div>
+                <div class="dimension-comment">{{.Comment}}</div>
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+
+        {{if .GitHubStats.Languages}}
+        <div class="section-title">技术栈</div>
+        <div class="languages">
+            {{range $lang, $bytes := .GitHubStats.Languages}}
+            <div class="lang-tag">
+                <span class="lang-dot" style="background: {{langColor $lang}}"></span>
+                {{$lang}}
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+
+        <div class="section-title">项目信息</div>
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">License</span>
+                <span class="meta-value">{{if .GitHubStats.License}}{{.GitHubStats.License}}{{else}}N/A{{end}}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">创建时间</span>
+                <span class="meta-value">{{.GitHubStats.CreatedAt}}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">最后更新</span>
+                <span class="meta-value">{{.GitHubStats.UpdatedAt}}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">生成时间</span>
+                <span class="meta-value">{{.GeneratedAt}}</span>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <span>Powered by GitHub Doctor</span>
+            <span>{{.GeneratedAt}}</span>
+        </footer>
+    </div>
+</body>
+</html>

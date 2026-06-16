@@ -1,0 +1,22 @@
+# 二进制文件
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 测试二进制
+*.test
+
+# 输出
+*.out
+
+# 依赖目录
+vendor/
+
+# bin 目录（codegraph 下载位置）
+bin/
+
+# 临时文件
+*.tmp
+*.temp
