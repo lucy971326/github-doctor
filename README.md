@@ -54,6 +54,16 @@ go build -o github-doctor.exe .
 4. 是否深度分析（y/n）
 5. DeepSeek API Key（仅深度分析需要）
 
+**codegraph 说明：** 首次深度分析时会自动下载 codegraph。如自动下载失败，可手动安装：
+
+```bash
+# npm 安装
+npm i -g @colbymchenry/codegraph
+
+# 或使用官方安装脚本
+curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh
+```
+
 ## 架构
 
 ```mermaid
