@@ -1,7 +1,7 @@
 # 🏥 GitHub Doctor
 
 GitHub 仓库体检工具 — 输入 URL，自动生成可视化分析报告。
-
+注: 仅支持windows系统
 ![示例](docs/image.png)
 
 ## 核心亮点
